@@ -1,3 +1,5 @@
+import scala.collection.mutable
+
 @main
 def tests(): Unit = {
   println("should be true: " + parity(List(true, true, false, true, false, false)))
@@ -67,3 +69,40 @@ def makeStringDelim[A](xs: Seq[A], delim: String = ""): String = {
  * REWRITTEN HOMEWORKS USING .filter() AND .map() INSTEAD OF FOR-COMPREHENSIONS
  */
 
+object LectureExcercises {
+  //Homework 1
+  def transcribe(s: String): String = for (c <- s) yield if (c == 'T') 'U' else c
+
+  def reverseComplement(s: String): String = {
+    for (c <- s.reverse) yield if (c == 'T') 'A' else if (c == 'A') 'T' else if (c == 'G') 'C' else 'G'
+  }
+
+  //Homework 2
+  def countNucleotides(s: String): Map[Char, Int] = {
+    val countNucs = mutable.Map('A' -> 0, 'C' -> 0, 'G' -> 0, 'T' -> 0)
+    for (c <- s) yield countNucs(c) += 1
+    countNucs.toMap
+  }
+
+  def findMotif(s1: String, s2: String): List[Int] = {
+    if (s1.equals("") || s2.equals("") || s2.length > s1.length) then return List()
+    (for i <- 0 until 1 + s1.length - s2.length yield if s1.substring(i, i + s2.length) == s2 then i + 1 else -1).filter(_ >= 0).toList
+  }
+
+  // Homework 3
+  def profile(seq: Seq[String]): Seq[Map[Char, Int]] = {
+    val inverseSeq: Seq[String] = seq.transpose.map(_.mkString)
+    for (string <- inverseSeq) yield Map('A' -> string.count(_ == 'A'), 'C' -> string.count(_ == 'C'), 'G' -> string.count(_ == 'G'), 'T' -> string.count(_ == 'T')).filter { case (_, count) => count != 0 }
+  }
+
+  def consensus(seq: Seq[String]): String = {
+    (for (map <- profile(seq)) yield map.maxBy(_._2)._1.toString).mkString
+  }
+
+  //Homework 4
+  def translateRna(rna: String): String = {
+    (for (i <- 0 until rna.length) yield if (i == 0 || i % 3 == 0) {
+      CodonTable.getAminoAcid(rna.substring(i, i + 3))
+    } else "").filter(_ != "").filter(_ != "Stop").mkString
+  }
+}
